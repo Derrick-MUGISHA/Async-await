@@ -1,28 +1,83 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Camera Access Example</title>
-</head>
-<body>
+
+    <style>
+      video,
+      canvas {
+        border: 1px solid #ccc;
+        display: block;
+        margin-bottom: 10px;
+      }
+      #screenshots img {
+        max-width: 150px;
+        margin: 5px;
+      }
+    </style>
+  </head>
+  <body>
     <h1>Camera Access Example</h1>
     <video id="camera" autoplay playsinline width="640" height="480"></video>
-    <button id="startBtn"> start camera</button>
+    <button id="startBtn">start camera</button>
+    <button id="snapBtn">Take Screen shot</button>
+
+    <h2>saved screen shots</h2>
+    <button id="screenshots">Take screen shots</button>
 
     <script>
-        const startBtn = document.getElementById('startBtn');
-        const video = document.getElementById('camera');
+      const startBtn = document.getElementById("startBtn");
+      const video = document.getElementById("camera");
+      const snapBtn = document.getElementById("snapBtn");
+      const screenshotsDiv = document.getElementById("screenshots");
 
-        startBtn.addEventListener('click', async () => {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({video: true});
-                video.srcObject = stream
-            } catch (error) {
-                console.log('Error accessing camera:', err);
-                alert('couldent access the camera, please check permission');
-            }
-        });
+      // load saved screen shots from localstorange on a page load
+
+      const savedScreenshots = JSON.parse(
+        localStorage.getItem("screenshots") || "[]"
+      );
+      savedScreenshots.forEach((scr) => addImage(src));
+
+      startBtn.addEventListener("click", async () => {
+        try {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          video.srcObject = stream;
+        } catch (error) {
+          console.log("Error accessing camera:", err);
+          alert("couldent access the camera, please check permission");
+        }
+      });
+
+      snapBtn.addEventListener("click", () => {
+        // Create a canvas to draw the current video frame
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        // Convert the canvas to a base64 image
+        const imageData = canvas.toDataURL("image/png");
+
+        // Save to localStorage
+        const screenshots = JSON.parse(
+          localStorage.getItem("screenshots") || "[]"
+        );
+        screenshots.push(imageData);
+        localStorage.setItem("screenshots", JSON.stringify(screenshots));
+
+        // Display the new screenshot
+        addImage(imageData);
+      });
+      function addImage(src) {
+        const img = document.createElement("img");
+        img.src = src;
+        screenshotsDiv.appendChild(img);
+      }
     </script>
-</body>
+  </body>
 </html>

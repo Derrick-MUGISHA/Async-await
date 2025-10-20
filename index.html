@@ -33,7 +33,7 @@
       const snapBtn = document.getElementById("snapBtn");
       const screenshotsDiv = document.getElementById("screenshots");
 
-      // load saved screen shots from localstorange on a page load
+      // load saved screen shots from localstorage on a page load
 
       const savedScreenshots = JSON.parse(
         localStorage.getItem("screenshots") || "[]"
@@ -48,7 +48,7 @@
           video.srcObject = stream;
         } catch (error) {
           console.log("Error accessing camera:", err);
-          alert("couldent access the camera, please check permission");
+          alert("couldest access the camera, please check permission");
         }
       });
 
